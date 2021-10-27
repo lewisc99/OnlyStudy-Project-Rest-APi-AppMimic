@@ -33,15 +33,31 @@ namespace Mimic_Api.Controllers
         //app -- /api/palavras
         //app -- /api/palavras?numero
         [HttpGet]
-        public ActionResult ObterTodas(DateTime? data,int? pagnumero)
+
+        //criando paginação
+        public ActionResult ObterTodas(DateTime? data,int? pagNumero,int? pagRegistroPag)
         {
             var item = _banco.Palavras.AsQueryable();
+           
+
 
             if (data.HasValue)
             {
                 item = item.Where(a => a.Criado > data.Value|| a.Atualizado > data.Value);
 
             }
+            if (pagNumero.HasValue)
+            {
+               
+                item = item.Skip(pagNumero.Value -1 * pagRegistroPag.Value).Take(pagRegistroPag.Value); //se não tiver registro coloca sempre value que pega nulo.
+                //se ta na primeira pagina não precisa pular
+                //se ta na segunda pagina  precisa pular todos os registros.  o que estão na primeira.
+                //exemplo se a pagina e um subtrai por 1, 0 * 10 registro por pagina e igual a 0, então não pula ninguem.
+                // assim mostra 0 a 10 registro na primeira pagina.
+
+            }
+
+
 
             //retornando um ok vai retornar
             // para o metodo mais popular no caso JSON
