@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Mimic_Api.Helpers;
 using MimicApi.Database;
 using MimicApi.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,26 +36,62 @@ namespace Mimic_Api.Controllers
         //app -- /api/palavras?numero
         [HttpGet]
 
+
+
         //criando paginação
-        public ActionResult ObterTodas(DateTime? data,int? pagNumero,int? pagRegistroPag)
+
+        //fromQuery quer dizer que veio da url exemplo: localhost:44349/api/palavras?pagNumero=3&pagRegistro=1
+        public ActionResult ObterTodas([FromQuery]PalavraUrlQuery query)
         {
-            var item = _banco.Palavras.AsQueryable();
+
+            //se notar logo acima foi criado uma classe em Helpers
+            //com as propriedades que usando no parametro ObterTodas
+            //poderiamos ter usado os parametros direto, acima e apenas para deixar o 
+            //codigo mais limpo.
+
+
+
+          
+            var item = _banco.Palavras.AsQueryable();  //para retornar alguma consulta sql.
            
 
 
-            if (data.HasValue)
+            if (query.data.HasValue)
             {
-                item = item.Where(a => a.Criado > data.Value|| a.Atualizado > data.Value);
+                item = item.Where(a => a.Criado > query.data.Value|| a.Atualizado > query.data.Value);
 
             }
-            if (pagNumero.HasValue)
+            if (query.pagNumero.HasValue)
             {
-               
-                item = item.Skip(pagNumero.Value -1 * pagRegistroPag.Value).Take(pagRegistroPag.Value); //se não tiver registro coloca sempre value que pega nulo.
+                var quantidadeTotalRegistros = item.Count();
+
+
+                item = item.Skip(query.pagNumero.Value - 1 * query.pagRegistro.Value).Take(query.pagRegistro.Value); //se não tiver registro coloca sempre value que pega nulo.
                 //se ta na primeira pagina não precisa pular
                 //se ta na segunda pagina  precisa pular todos os registros.  o que estão na primeira.
                 //exemplo se a pagina e um subtrai por 1, 0 * 10 registro por pagina e igual a 0, então não pula ninguem.
                 // assim mostra 0 a 10 registro na primeira pagina.
+                var paginacao = new Paginacao();
+
+
+                paginacao.NumeroPagina = query.pagNumero.Value;
+                paginacao.RegistroPorPagina = query.pagRegistro.Value;
+                paginacao.TotalRegistro = quantidadeTotalRegistros;
+                paginacao.TotalPaginas = (int)Math.Ceiling((double)quantidadeTotalRegistros / query.pagRegistro.Value);  // 30/10 = 3, 
+
+
+
+
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(paginacao));
+
+                if (query. pagNumero > paginacao.TotalPaginas)
+
+                {
+                    return NotFound();
+                }
+
+
+
 
             }
 
