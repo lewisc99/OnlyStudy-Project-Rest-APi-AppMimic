@@ -64,7 +64,7 @@ namespace Mimic_Api.Repositories
 
             }
 
-            lista.AddRange(item.ToList());
+            lista.Resuls.AddRange(item.ToList());
 
             return lista;
         }

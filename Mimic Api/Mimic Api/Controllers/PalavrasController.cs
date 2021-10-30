@@ -47,7 +47,8 @@ namespace Mimic_Api.Controllers
         //criando paginação
 
         //fromQuery quer dizer que veio da url exemplo: localhost:44349/api/palavras?pagNumero=3&pagRegistro=1
-        [HttpGet("")]
+        [HttpGet("",Name ="ObterTodas")]
+        //  [HttpGet("")]
 
         public ActionResult ObterTodas([FromQuery]PalavraUrlQuery query)
         {
@@ -55,15 +56,16 @@ namespace Mimic_Api.Controllers
            var item = _repo.ObterPalavras(query);
 
 
-          /*  if (query.pagNumero > item.Paginacao.TotalPaginas)
-            {
-                return NotFound();
-            }
-           */
+            /*  if (query.pagNumero > item.Paginacao.TotalPaginas)
+              {
+                  return NotFound();
+              }
+             */
 
 
 
-          if (item.Count == 0) //se nap tiver nenhum item em uma pagina, então retorna abaixo.
+            // if (item.Count == 0) //se nap tiver nenhum item em uma pagina, então retorna abaixo.
+            if (item.Resuls.Count == 0) 
             {
                 return NotFound();
             }
@@ -80,15 +82,15 @@ namespace Mimic_Api.Controllers
           var lista = _mapper.Map<PaginationList<Palavra>,PaginationList<PalavraDTO>>(item);
 
             //para cada palavra adiciona um link
-            foreach(var palavra in lista)
+           // foreach(var palavra in lista)
+            foreach(var palavra in lista.Resuls)
             {
 
                 palavra.Links = new List<LinkDTO>();
                 palavra.Links.Add(new LinkDTO("self", Url.Link("ObterPalavra", new { id = palavra.Id }), "GET"));
             }
-
-
-
+            //se tiver parametros na query da url tipo localhost:44349/api/palavras?pagNumero=1&pagRegistro=2, ele aceita, caso não tenha aparece todas os itens da lista.
+            lista.Links.Add(new LinkDTO("self", Url.Link("ObterTodas", query), "GET"));
 
             return Ok(lista);
         }

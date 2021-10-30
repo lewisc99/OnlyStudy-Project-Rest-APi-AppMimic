@@ -18,7 +18,7 @@ namespace Mimic_Api.Helpers
             //primeiro parametros e a classe de origem, depois a classe que quer
             //enviar as informações.
             CreateMap<Palavra, PalavraDTO>();
-
+            CreateMap<PaginationList<Palavra>, PaginationList<PalavraDTO>>();
 
         }
     }
