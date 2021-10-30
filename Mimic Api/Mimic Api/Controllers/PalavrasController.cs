@@ -72,12 +72,7 @@ namespace Mimic_Api.Controllers
 
 
 
-          if(item.Paginacao != null)
-            {
-                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Paginacao));
-
-
-            }
+         
 
           var lista = _mapper.Map<PaginationList<Palavra>,PaginationList<PalavraDTO>>(item);
 
@@ -91,6 +86,32 @@ namespace Mimic_Api.Controllers
             }
             //se tiver parametros na query da url tipo localhost:44349/api/palavras?pagNumero=1&pagRegistro=2, ele aceita, caso não tenha aparece todas os itens da lista.
             lista.Links.Add(new LinkDTO("self", Url.Link("ObterTodas", query), "GET"));
+
+            if (item.Paginacao != null)
+            {
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Paginacao));
+
+                lista.Links.Add(new LinkDTO("self", Url.Link("ObterTodas",query), "GET"));
+
+
+                if(query.pagNumero + 1 <= item.Paginacao.TotalPaginas)
+                {
+                    var queryString = new PalavraUrlQuery() { pagNumero = query.pagNumero + 1, pagRegistro = query.pagRegistro, data = query.data };
+                    lista.Links.Add(new LinkDTO("next", Url.Link("ObterTodas", queryString), "GET"));
+                }
+
+
+                if (query.pagNumero - 1 > 0 )
+                {
+                    var queryString = new PalavraUrlQuery() { pagNumero = query.pagNumero - 1, pagRegistro = query.pagRegistro, data = query.data };
+                    lista.Links.Add(new LinkDTO("prev", Url.Link("ObterTodas", queryString), "GET"));
+                }
+
+
+            }
+
+
+
 
             return Ok(lista);
         }
