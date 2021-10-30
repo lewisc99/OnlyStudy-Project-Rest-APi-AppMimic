@@ -11,7 +11,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/palavras",
+      "launchUrl": "swagger", //para que sempre precise mudar a rota inicial apenas precisa tirar o api/palavras para swagger
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

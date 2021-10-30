@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Mimic_Api.Helpers;
 using Mimic_Api.V1.Repositories;
 using Mimic_Api.V1.Repositories.Contracts;
@@ -62,48 +63,64 @@ namespace Mimic_Api
 
             //adicionar versionamento de API, precisa antes baixar o pacote nuget, 
 
-        /*  <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
-            <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" /> */
+            /*  <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+                <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" /> */
 
-            services.AddApiVersioning( cft =>
-            { //esse codigo abaixo pode ate deixar em branco, isso e apenas para informar a versão da APi.
-                cft.ReportApiVersions = true; //quand coloca essa informação vai informar quais versão da API são suportadas no sistema
+            services.AddApiVersioning(cft =>
+           { //esse codigo abaixo pode ate deixar em branco, isso e apenas para informar a versão da APi.
+               cft.ReportApiVersions = true; //quand coloca essa informação vai informar quais versão da API são suportadas no sistema
 
 
-              //  cft.ApiVersionReader = new HeaderApiVersionReader("api-version"); //dessa forma no querystring ou url, ou Cabeçalho,
-                //para o usuario escolher a versão ee precisa colocar api-version= + o numero da versão.
+               //  cft.ApiVersionReader = new HeaderApiVersionReader("api-version"); //dessa forma no querystring ou url, ou Cabeçalho,
+               //para o usuario escolher a versão ee precisa colocar api-version= + o numero da versão.
 
-                cft.AssumeDefaultVersionWhenUnspecified = true; //caso a versão da API não seja especificada pode usar eesse comonda
-                                                                //que vai usar a versão padrão ao iniciar que no caso é a abaixa 1.0
+               cft.AssumeDefaultVersionWhenUnspecified = true; //caso a versão da API não seja especificada pode usar eesse comonda
+                                                               //que vai usar a versão padrão ao iniciar que no caso é a abaixa 1.0
 
-             
+               cft.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+           });
 
-                cft.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0); 
+
+            // esse comando abaixo, informa para criar um Swagger,
+            //com o titilo Mimic APi na version 1.0
+            services.AddSwaggerGen(c =>
+            {
+                c.ResolveConflictingActions(apiDescription => apiDescription.First()); //esse codigo sgnifica se tiver conflito de url
+                //vai pegar o primeiro e desconsiderar os demais.
+
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MimicAPi", Version = "v1" });
+            });
+
+
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+               
             }
+
+            app.UseStatusCodePages(); //quando fazer um request, e retornar exemplo 404
+                                      //usando esse metodo vai retornar uma mensagem mais informal para o lado do cliente.
+
+
+            app.UseSwagger(); //primeiro ele cria um arquivo.
+            //configurando a interface grafica, dizendo que endpoint será nesse caminho
+            app.UseSwaggerUI(c => {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "MimicAPI");
+                //  c.RoutePrefix = string.Empty;  //para que não fique sempre colocando o swagger na url, quando iniciar vai direcionar direto para o swagger
                 
-                );
+            });
 
+            app.UseRouting();
 
-}
-
-// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-{
-if (env.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-
-
-app.UseStatusCodePages(); //quando fazer um request, e retornar exemplo 404
-//usando esse metodo vai retornar uma mensagem mais informal para o lado do cliente.
-
-app.UseRouting();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-}
-}
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+        }
+    }
 }
