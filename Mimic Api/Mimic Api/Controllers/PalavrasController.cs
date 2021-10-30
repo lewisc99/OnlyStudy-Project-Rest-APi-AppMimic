@@ -154,7 +154,8 @@ namespace Mimic_Api.Controllers
 
             //como temos uma propriedade em palavraDTO a mais que palavra que é LINK, criamos abaixo uma instanciamos, da classe Link, que têm 3 propriedades Rel
             //Href e metodo, criamos uma lista de objeto de link, para que possa ser adicionado varios link dentro do objeto caso venha ter outro links para atualizar editar etc.
-            palavraDTO.Links = new List<LinkDTO>();
+         
+            // palavraDTO.Links = new List<LinkDTO>();
 
             //adicionamos na propriedade link da classe palavraDTO uma nova instancia de LINKDTO,
             //e usamos sua propriedade que no caso é rel = para ele mesmo(Self), href= que e o link para o id, e method Get para apenas acessar o id.
@@ -193,11 +194,18 @@ namespace Mimic_Api.Controllers
          //para cadastrar não precisa acessar nenhum id
         //assim pode acessar igual o metodo para obter todos api/palavras
         [HttpPost]
-        public ActionResult Cadastrar([FromBody]Palavra Palavra)
+        public ActionResult Cadastrar([FromBody]Palavra palavra)
         {
-            _repo.Cadastrar(Palavra);
-           
-            return Created($"/api/palavras/{Palavra.Id}",Palavra);
+            _repo.Cadastrar(palavra);
+
+
+           PalavraDTO palavraDTO =  _mapper.Map<Palavra, PalavraDTO>(palavra);
+
+            palavraDTO.Links.Add(
+                new LinkDTO("self", Url.Link("ObterPalavra", new { id = palavraDTO.Id }), "GET"));
+
+
+            return Created($"/api/palavras/{palavra.Id}", palavraDTO);
             //return created e usado quando e feito o cadastro de intem, 
             //ai o sistema vai redicionar o usario para o cadastro que mesmo acabou de fazer.
             //pela url /api/palavras/id da palavra cadastra, e no corpo retorna a palavra.
@@ -231,6 +239,13 @@ namespace Mimic_Api.Controllers
 
             palavra.Id = id;
             _repo.Atualizar(palavra);
+
+            PalavraDTO palavraDTO = _mapper.Map<Palavra, PalavraDTO>(palavra);
+             
+            palavraDTO.Links.Add(new LinkDTO("self",
+                Url.Link("ObterPalavra", new { id = id }), "GET"));
+
+
             return Ok();
         }
 
