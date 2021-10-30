@@ -17,6 +17,10 @@ namespace Mimic_Api.V2.Controllers
 
     [Route("api/v{version:apiVersion}/palavras")]
 
+  //  [Route("api/[Controller]")]
+
+
+
     [ApiController]
     [ApiVersion("2.0")] //so isso de colocar a versão já e suficiente para classicar as versões da APi.
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -67,6 +68,16 @@ namespace Mimic_Api
             services.AddApiVersioning( cft =>
             { //esse codigo abaixo pode ate deixar em branco, isso e apenas para informar a versão da APi.
                 cft.ReportApiVersions = true; //quand coloca essa informação vai informar quais versão da API são suportadas no sistema
+
+
+              //  cft.ApiVersionReader = new HeaderApiVersionReader("api-version"); //dessa forma no querystring ou url, ou Cabeçalho,
+                //para o usuario escolher a versão ee precisa colocar api-version= + o numero da versão.
+
+                cft.AssumeDefaultVersionWhenUnspecified = true; //caso a versão da API não seja especificada pode usar eesse comonda
+                                                                //que vai usar a versão padrão ao iniciar que no caso é a abaixa 1.0
+
+             
+
                 cft.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0); 
             }
                 

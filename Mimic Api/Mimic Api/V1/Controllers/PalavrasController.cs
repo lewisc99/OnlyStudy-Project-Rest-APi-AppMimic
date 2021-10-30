@@ -18,7 +18,7 @@ namespace Mimic_Api.V1.Controllers
 
     //  [Route("api/palavras")] //nome api/mais depois o nome do controller Palavras
 
-    [Route("api/v{version:apiVersion}/palavras")]
+   // [Route("api/v{version:apiVersion}/palavras")]
 
     [ApiController] //para usar o versionamento precisa colocar o API Controller.
 
@@ -39,6 +39,11 @@ namespace Mimic_Api.V1.Controllers
     //
     //tambem e preciso em cima da classe informa que 
     [ApiVersion("1.1")]
+   //[Route("api/[controller]")]
+
+    //acessando api atraves de querystring no caso primeiro, alterar o route que especifica a versiao
+     [Route("api/v{version:apiVersion}/palavras")] // e la no url, especifica a versao que quer usar.
+    //localhost:44349/api/palavras?api-version=1
 
 
     public class PalavrasController:ControllerBase
