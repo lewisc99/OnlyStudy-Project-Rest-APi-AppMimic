@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "XGLVMFO90Na9vAyNqFHVBrHaC7n2kf2tGgk8COz1uqq+tFva1fk0R38JMO2ABgFKhM2h18b4bTvmisCsXxb48A==",
+  "dgSpecHash": "hio+a01eP5D5bAXrMDdmjLTH+D++gcXmAuOQopTmop8mWrxZfbG6vQuAN73yOoRAa+aAD/nVpANRES26MXBsNQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\Pichau\\Desktop\\Mimic\\Mimic Api\\Mimic Api\\Mimic Api.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Pichau\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\Pichau\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\Pichau\\.nuget\\packages\\microsoft.aspnetcore.jsonpatch\\5.0.11\\microsoft.aspnetcore.jsonpatch.5.0.11.nupkg.sha512",
     "C:\\Users\\Pichau\\.nuget\\packages\\microsoft.aspnetcore.mvc.newtonsoftjson\\5.0.11\\microsoft.aspnetcore.mvc.newtonsoftjson.5.0.11.nupkg.sha512",
@@ -37,7 +38,8 @@
     "C:\\Users\\Pichau\\.nuget\\packages\\system.collections.immutable\\5.0.0\\system.collections.immutable.5.0.0.nupkg.sha512",
     "C:\\Users\\Pichau\\.nuget\\packages\\system.componentmodel.annotations\\5.0.0\\system.componentmodel.annotations.5.0.0.nupkg.sha512",
     "C:\\Users\\Pichau\\.nuget\\packages\\system.diagnostics.diagnosticsource\\5.0.1\\system.diagnostics.diagnosticsource.5.0.1.nupkg.sha512",
-    "C:\\Users\\Pichau\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512"
+    "C:\\Users\\Pichau\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
+    "C:\\Users\\Pichau\\.nuget\\packages\\system.reflection.emit\\4.7.0\\system.reflection.emit.4.7.0.nupkg.sha512"
   ],
   "logs": []
 }

@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mimic_Api.Helpers;
-using MimicApi.Database;
+using Mimic_Api.Models.DTO;
+using Mimic_Api.Repositories;
+using Mimic_Api.Repositories.Contracts;
+
 using MimicApi.Models;
 using Newtonsoft.Json;
 using System;
@@ -17,14 +21,16 @@ namespace Mimic_Api.Controllers
     [ApiController]
     public class PalavrasController:ControllerBase
     {
-        private readonly MimicContext _banco;
-        public PalavrasController(MimicContext  banco)
+       // private readonly MimicContext _banco; //tira a dependencia do banco
+        private readonly IPalavraRepository _repo; //tira a dependencia do banco de dados, e coloca um repositorio especifico para as palavras.
+        private readonly IMapper _mapper; //tira a dependencia do banco de dados, e coloca um repositorio especifico para as palavras.
+
+        public PalavrasController(IPalavraRepository banco, IMapper mapper)
         {
-            _banco = banco;
-
-
-
+            _repo = banco;
+            _mapper = mapper;
         }
+
 
 
 
@@ -34,101 +40,130 @@ namespace Mimic_Api.Controllers
 
         //app -- /api/palavras
         //app -- /api/palavras?numero
-        [HttpGet]
+
 
 
 
         //criando paginação
 
         //fromQuery quer dizer que veio da url exemplo: localhost:44349/api/palavras?pagNumero=3&pagRegistro=1
+        [HttpGet("")]
+
         public ActionResult ObterTodas([FromQuery]PalavraUrlQuery query)
         {
 
-            //se notar logo acima foi criado uma classe em Helpers
-            //com as propriedades que usando no parametro ObterTodas
-            //poderiamos ter usado os parametros direto, acima e apenas para deixar o 
-            //codigo mais limpo.
+           var item = _repo.ObterPalavras(query);
 
 
-
-          
-            var item = _banco.Palavras.AsQueryable();  //para retornar alguma consulta sql.
-           
-
-
-            if (query.data.HasValue)
+          /*  if (query.pagNumero > item.Paginacao.TotalPaginas)
             {
-                item = item.Where(a => a.Criado > query.data.Value|| a.Atualizado > query.data.Value);
-
+                return NotFound();
             }
-            if (query.pagNumero.HasValue)
+           */
+
+
+
+          if (item.Count == 0) //se nap tiver nenhum item em uma pagina, então retorna abaixo.
             {
-                var quantidadeTotalRegistros = item.Count();
-
-
-                item = item.Skip(query.pagNumero.Value - 1 * query.pagRegistro.Value).Take(query.pagRegistro.Value); //se não tiver registro coloca sempre value que pega nulo.
-                //se ta na primeira pagina não precisa pular
-                //se ta na segunda pagina  precisa pular todos os registros.  o que estão na primeira.
-                //exemplo se a pagina e um subtrai por 1, 0 * 10 registro por pagina e igual a 0, então não pula ninguem.
-                // assim mostra 0 a 10 registro na primeira pagina.
-                var paginacao = new Paginacao();
-
-
-                paginacao.NumeroPagina = query.pagNumero.Value;
-                paginacao.RegistroPorPagina = query.pagRegistro.Value;
-                paginacao.TotalRegistro = quantidadeTotalRegistros;
-                paginacao.TotalPaginas = (int)Math.Ceiling((double)quantidadeTotalRegistros / query.pagRegistro.Value);  // 30/10 = 3, 
-
-
-
-
-                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(paginacao));
-
-                if (query. pagNumero > paginacao.TotalPaginas)
-
-                {
-                    return NotFound();
-                }
-
-
-
-
+                return NotFound();
             }
 
 
 
+          if(item.Paginacao != null)
+            {
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(item.Paginacao));
+
+
+            }
+
+          var lista = _mapper.Map<PaginationList<Palavra>,PaginationList<PalavraDTO>>(item);
+
+            //para cada palavra adiciona um link
+            foreach(var palavra in lista)
+            {
+
+                palavra.Links = new List<LinkDTO>();
+                palavra.Links.Add(new LinkDTO("self", Url.Link("ObterPalavra", new { id = palavra.Id }), "GET"));
+            }
+
+
+
+
+            return Ok(lista);
+        }
+
+
+        //  Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(paginacao));
             //retornando um ok vai retornar
             // para o metodo mais popular no caso JSON
-            return  Ok(item);
+         
 
            
 
 
-        }
+        
 
         //metodos para Web,
         //no usando Crud.
 
          // /api/palavras/1 (1 e o id).
-        [HttpGet("{id}")]
+        [HttpGet("{id}",Name ="ObterPalavra")]
         public ActionResult Obter(int id)
 
         {
-            var obj = _banco.Palavras.Find(id);
+
+            var obj = _repo.Obter( id);
+
+
             if (obj ==null)
             {
                 return NotFound(); //notfound tem que adotar toda vez que não localizar informação
                 //ou pode retornar o status do codigo no caso
                 // return StatusCode(404);
-
+                
 
             }
 
+            //primeiro nos criamos um objeto que herda de PalavraDTO, e mapeia as informações que estão na classe Palavra, e coloca em Palavra DTO,
+            //obj e e obj que chamamos atraves do id no parametro Obter
+            PalavraDTO palavraDTO = _mapper.Map<Palavra, PalavraDTO>(obj);
 
+            //como temos uma propriedade em palavraDTO a mais que palavra que é LINK, criamos abaixo uma instanciamos, da classe Link, que têm 3 propriedades Rel
+            //Href e metodo, criamos uma lista de objeto de link, para que possa ser adicionado varios link dentro do objeto caso venha ter outro links para atualizar editar etc.
+            palavraDTO.Links = new List<LinkDTO>();
 
+            //adicionamos na propriedade link da classe palavraDTO uma nova instancia de LINKDTO,
+            //e usamos sua propriedade que no caso é rel = para ele mesmo(Self), href= que e o link para o id, e method Get para apenas acessar o id.
 
+            //LINK para obter o ID
+            /* antigo codigo funciona da mesma maneira, so que vamos mudar o $(link), para o
+             * caso o o localhost seja alterado para algum servidor etc, altera o url automaticamente.
+            palavraDTO.Links.Add(new LinkDTO(
+                "self",
+                $"https://localhost:44349/api/palavras/{palavraDTO.Id}",
+                "GET")); */
 
-            return Ok(_banco.Palavras.Find(id)); //quando dar certo retorna ok que no caso e 200
+            //LINK para obter o ID
+
+            palavraDTO.Links.Add(new LinkDTO(
+                "self",
+                Url.Link("ObterPalavra",new { id = palavraDTO.Id }),
+                "GET"));
+
+            //LINK para Editar o ID
+            palavraDTO.Links.Add(new LinkDTO(
+               "self",
+               Url.Link("AtualizarPalavra",new { id = palavraDTO.Id }),
+               "PUT"));
+
+            //LINK para excluir o ID.
+            palavraDTO.Links.Add(new LinkDTO(
+              "self",
+              Url.Link("ExcluirPalavra",new { id = palavraDTO.Id }),
+              "DELETE"));
+
+            return Ok(palavraDTO); //quando dar certo retorna ok que no caso e 200
         }
 
 
@@ -137,8 +172,8 @@ namespace Mimic_Api.Controllers
         [HttpPost]
         public ActionResult Cadastrar([FromBody]Palavra Palavra)
         {
-            _banco.Palavras.Add(Palavra);
-            _banco.SaveChanges();
+            _repo.Cadastrar(Palavra);
+           
             return Created($"/api/palavras/{Palavra.Id}",Palavra);
             //return created e usado quando e feito o cadastro de intem, 
             //ai o sistema vai redicionar o usario para o cadastro que mesmo acabou de fazer.
@@ -149,13 +184,17 @@ namespace Mimic_Api.Controllers
         // -- /api/palavras/1 (put:id,nome,ativo,pontução,criacao).
 
        // /api/palavras/1 (1 e o id).
-        [HttpPut("{id}")]
+        [HttpPut("{id}",Name = "AtualizarPalavra")]
         public ActionResult Atualizar(int id,[FromBody]Palavra palavra)
         {
 
 
+           var obj =  _repo.Obter(id);
+
+
+
             //codigo antigo   var obj = _banco.Palavras.find(id);
-            var obj = _banco.Palavras.AsNoTracking().FirstOrDefault(banco => banco.Id == id); //se tiver problema usando o find usa o codigo
+         //   var obj = _banco.Palavras.AsNoTracking().FirstOrDefault(banco => banco.Id == id); //se tiver problema usando o find usa o codigo
             //_banco.Palavras.AsNoTracking().FirstOrdefault(); 
             //porque o entity framework mapeia toda consulta e guarda, e como criamos outro var obj o entity framework informa que tem 2 objetos do mesmo tipo o var obj e o palavra.id abaixo que tentamos consutlar.
             if (obj == null)
@@ -168,8 +207,7 @@ namespace Mimic_Api.Controllers
             }
 
             palavra.Id = id;
-            _banco.Palavras.Update(palavra);
-            _banco.SaveChanges();
+            _repo.Atualizar(palavra);
             return Ok();
         }
 
@@ -177,11 +215,11 @@ namespace Mimic_Api.Controllers
 
        
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}",Name = "ExcluirPalavra")]
         public ActionResult  Deletar(int id)
         {
 
-            var obj = _banco.Palavras.Find(id);
+            var obj = _repo.Obter(id);
             if (obj == null)
             {
                 return NotFound(); //notfound tem que adotar toda vez que não localizar informação
@@ -191,8 +229,7 @@ namespace Mimic_Api.Controllers
 
             }
 
-            _banco.Palavras.Remove(_banco.Palavras.Find(id));
-            _banco.SaveChanges();
+            _repo.Deletar(id);
             return Ok();
         }
     }

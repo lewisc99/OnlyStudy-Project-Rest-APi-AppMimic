@@ -54,3 +54,4 @@ C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\Microsoft.Asp
 C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\Newtonsoft.Json.dll
 C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\Newtonsoft.Json.Bson.dll
+C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\AutoMapper.dll
