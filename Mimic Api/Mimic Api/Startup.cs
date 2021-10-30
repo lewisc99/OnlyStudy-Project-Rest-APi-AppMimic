@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Mimic_Api.Helpers;
+using Mimic_Api.Helpers.Swagger;
 using Mimic_Api.V1.Repositories;
 using Mimic_Api.V1.Repositories.Contracts;
 using MimicApi.Database;
@@ -86,9 +87,35 @@ namespace Mimic_Api
             services.AddSwaggerGen(c =>
             {
                 c.ResolveConflictingActions(apiDescription => apiDescription.First()); //esse codigo sgnifica se tiver conflito de url
-                //vai pegar o primeiro e desconsiderar os demais.
+                                                                                       //vai pegar o primeiro e desconsiderar os demais.
+                c.SwaggerDoc("v2.0", new OpenApiInfo { Title = "MimicAPi  v2.0", Version = "v2.0" });
+                c.SwaggerDoc("v1.1", new OpenApiInfo { Title = "MimicAPi  v1.1", Version = "v1.1" });
+                c.SwaggerDoc("v1.0", new OpenApiInfo { Title = "MimicAPi v1.0", Version = "v1.0" });
 
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MimicAPi", Version = "v1" });
+
+
+                // para fazer esse versionamento de codigo, ou versão, funcionar usando o Swagger.
+
+                c.DocInclusionPredicate((docName, apiDesc) =>
+                {
+                    var actionApiVersionModel = apiDesc.ActionDescriptor?.GetApiVersion();
+                    // would mean this action is unversioned and should be included everywhere
+                    if (actionApiVersionModel == null)
+                    {
+                        return true;
+                    }
+                    if (actionApiVersionModel.DeclaredApiVersions.Any())
+                    {
+                        return actionApiVersionModel.DeclaredApiVersions.Any(v => $"v{v.ToString()}" == docName);
+                    }
+                    return actionApiVersionModel.ImplementedApiVersions.Any(v => $"v{v.ToString()}" == docName);
+                });
+
+                c.OperationFilter<ApiVersionOperationFilter>();
+
+
+
+
             });
 
 
@@ -110,7 +137,9 @@ namespace Mimic_Api
             app.UseSwagger(); //primeiro ele cria um arquivo.
             //configurando a interface grafica, dizendo que endpoint será nesse caminho
             app.UseSwaggerUI(c => {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "MimicAPI");
+                c.SwaggerEndpoint("/swagger/v2.0/swagger.json", "MimicAPI V2.0");
+                c.SwaggerEndpoint("/swagger/v1.1/swagger.json", "MimicAPI V1.1");
+                c.SwaggerEndpoint("/swagger/v1.0/swagger.json", "MimicAPI V1.0");
                 //  c.RoutePrefix = string.Empty;  //para que não fique sempre colocando o swagger na url, quando iniciar vai direcionar direto para o swagger
                 
             });
