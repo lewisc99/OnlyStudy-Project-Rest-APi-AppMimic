@@ -196,6 +196,20 @@ namespace Mimic_Api.Controllers
         [HttpPost]
         public ActionResult Cadastrar([FromBody]Palavra palavra)
         {
+
+            if(palavra ==null)
+            {
+                return BadRequest(); //se palavra não for preenchida não tiver nada preenchdio
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return UnprocessableEntity(ModelState); //se o ModelState não for preenchido correto
+            }
+
+
+            palavra.Ativo = true;
+            palavra.Criado = DateTime.Now;
             _repo.Cadastrar(palavra);
 
 
@@ -219,13 +233,24 @@ namespace Mimic_Api.Controllers
         public ActionResult Atualizar(int id,[FromBody]Palavra palavra)
         {
 
+           
 
-           var obj =  _repo.Obter(id);
+            var obj =  _repo.Obter(id);
 
+
+            if (palavra == null)
+            {
+                return BadRequest(); //se palavra não for preenchida não tiver nada preenchdio
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return UnprocessableEntity(ModelState); //se o ModelState não for preenchido correto
+            }
 
 
             //codigo antigo   var obj = _banco.Palavras.find(id);
-         //   var obj = _banco.Palavras.AsNoTracking().FirstOrDefault(banco => banco.Id == id); //se tiver problema usando o find usa o codigo
+            //   var obj = _banco.Palavras.AsNoTracking().FirstOrDefault(banco => banco.Id == id); //se tiver problema usando o find usa o codigo
             //_banco.Palavras.AsNoTracking().FirstOrdefault(); 
             //porque o entity framework mapeia toda consulta e guarda, e como criamos outro var obj o entity framework informa que tem 2 objetos do mesmo tipo o var obj e o palavra.id abaixo que tentamos consutlar.
             if (obj == null)
@@ -238,6 +263,11 @@ namespace Mimic_Api.Controllers
             }
 
             palavra.Id = id;
+            palavra.Ativo = obj.Ativo;
+            palavra.Criado = obj.Criado;
+            palavra.Atualizado = DateTime.Now;
+
+
             _repo.Atualizar(palavra);
 
             PalavraDTO palavraDTO = _mapper.Map<Palavra, PalavraDTO>(palavra);
