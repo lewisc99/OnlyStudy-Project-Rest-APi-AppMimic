@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Mimic_Api.Helpers;
-using Mimic_Api.Repositories.Contracts;
+using Mimic_Api.V1.Repositories.Contracts;
 using MimicApi.Database;
-using MimicApi.Models;
+using MimicApi.V1.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Mimic_Api.Repositories
+namespace Mimic_Api.V1.Repositories
 {
     public class PalavraRepository : IPalavraRepository //temos uma classe que implementa uma interface
     {

@@ -2,23 +2,45 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mimic_Api.Helpers;
-using Mimic_Api.Models.DTO;
-using Mimic_Api.Repositories;
-using Mimic_Api.Repositories.Contracts;
+using Mimic_Api.V1.Models.DTO;
+using Mimic_Api.V1.Repositories;
+using Mimic_Api.V1.Repositories.Contracts;
 
-using MimicApi.Models;
+using MimicApi.V1.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Mimic_Api.Controllers
+namespace Mimic_Api.V1.Controllers
 {
 
-    [Route("api/palavras")] //nome api/mais depois o nome do controller Palavras
+    //  [Route("api/palavras")] //nome api/mais depois o nome do controller Palavras
 
-    [ApiController]
+    [Route("api/v{version:apiVersion}/palavras")]
+
+    [ApiController] //para usar o versionamento precisa colocar o API Controller.
+
+    // [ApiVersion("1.0")] //indicando a versão da API.
+
+    // [ApiVersion("1.0",Deprecated =true)] //forma de informa que a api está Obsoleta não funciona.
+
+    [ApiVersion("1.0",Deprecated =true)]
+    //imagina que você deseja criar uma outra versão da APi no caso 1.1
+
+    //ai acima do metodo informa qual versão deseja que seja padrão para o metodo.
+    //exemplo
+
+    /* [MapToApiVersion("1.0")]
+     public ActionResult ObterTodas([FromQuery] PalavraUrlQuery query)
+     {
+    */
+    //
+    //tambem e preciso em cima da classe informa que 
+    [ApiVersion("1.1")]
+
+
     public class PalavrasController:ControllerBase
     {
        // private readonly MimicContext _banco; //tira a dependencia do banco
@@ -45,10 +67,15 @@ namespace Mimic_Api.Controllers
 
 
         //criando paginação
-
+        [MapToApiVersion("1.0")]
+        [MapToApiVersion("1.1")]
         //fromQuery quer dizer que veio da url exemplo: localhost:44349/api/palavras?pagNumero=3&pagRegistro=1
         [HttpGet("",Name ="ObterTodas")]
         //  [HttpGet("")]
+
+
+        //indica que esse metodo vai funcionar nas duas versões.
+   
 
         public ActionResult ObterTodas([FromQuery]PalavraUrlQuery query)
         {
@@ -132,6 +159,11 @@ namespace Mimic_Api.Controllers
 
          // /api/palavras/1 (1 e o id).
         [HttpGet("{id}",Name ="ObterPalavra")]
+
+        //indica que esse metodo vai funcionar nas duas versões.
+        [MapToApiVersion("1.0")]
+        [MapToApiVersion("1.1")]
+
         public ActionResult Obter(int id)
 
         {
@@ -281,7 +313,11 @@ namespace Mimic_Api.Controllers
 
         // -- /api/palavras/1 (delete)
 
-       
+
+        //indica que esse metodo vai funcionar apenas na versão da APi 1.1
+        
+        [MapToApiVersion("1.1")]
+
 
         [HttpDelete("{id}",Name = "ExcluirPalavra")]
         public ActionResult  Deletar(int id)

@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mimic_Api.Helpers;
-using Mimic_Api.Repositories;
-using Mimic_Api.Repositories.Contracts;
+using Mimic_Api.V1.Repositories;
+using Mimic_Api.V1.Repositories.Contracts;
 using MimicApi.Database;
 using System;
 using System.Collections.Generic;
@@ -58,26 +58,41 @@ namespace Mimic_Api
             });
             services.AddScoped<IPalavraRepository, PalavraRepository>(); //this IServiceCollection services, Type serviceType //no caso primeiro um serviço de Tipo T depois a implemtação
 
-        }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
+            //adicionar versionamento de API, precisa antes baixar o pacote nuget, 
+
+        /*  <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+            <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" /> */
+
+            services.AddApiVersioning( cft =>
+            { //esse codigo abaixo pode ate deixar em branco, isso e apenas para informar a versão da APi.
+                cft.ReportApiVersions = true; //quand coloca essa informação vai informar quais versão da API são suportadas no sistema
+                cft.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0); 
             }
+                
+                );
 
 
-            app.UseStatusCodePages(); //quando fazer um request, e retornar exemplo 404
-            //usando esse metodo vai retornar uma mensagem mais informal para o lado do cliente.
-            
-            app.UseRouting();
+}
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-        }
-    }
+// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+if (env.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
+
+app.UseStatusCodePages(); //quando fazer um request, e retornar exemplo 404
+//usando esse metodo vai retornar uma mensagem mais informal para o lado do cliente.
+
+app.UseRouting();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+}
+}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Mimic_Api.Models.DTO
+namespace Mimic_Api.V1.Models.DTO
 {
     public class PalavraDTO:BaseDTO
     {

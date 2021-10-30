@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Mimic_Api.Models.DTO;
-using MimicApi.Models;
+using Mimic_Api.V1.Models.DTO;
+using MimicApi.V1.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
