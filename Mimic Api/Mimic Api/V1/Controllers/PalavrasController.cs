@@ -69,6 +69,11 @@ namespace Mimic_Api.V1.Controllers
         //app -- /api/palavras?numero
 
 
+        /// <summary>
+        /// ObterTodas operaao que pega do banco de dados todas palavras existentes. 
+        /// </summary>
+        /// <param name="query">Filtros de pesquisa</param>
+        /// <returns>listagem de palavras</returns>
 
 
         //criando paginação
@@ -156,7 +161,11 @@ namespace Mimic_Api.V1.Controllers
 
            
 
-
+        /// <summary>
+        /// Operação que pega uma unica palavra de base
+        /// </summary>
+        /// <param name="id">codigo da palavra</param>
+        /// <returns>um objeto de palavra</returns>
         
 
         //metodos para Web,
@@ -228,9 +237,20 @@ namespace Mimic_Api.V1.Controllers
         }
 
 
+
+        /// <summary>
+        /// operacao que realiza o cadastro da palavra.
+        /// </summary>
+        /// <param name="palavra">Um objeto da Palavra</param>
+        /// <returns>Um Objeto palavra com seu Id</returns>
+        /// 
+
+
          //para cadastrar não precisa acessar nenhum id
         //assim pode acessar igual o metodo para obter todos api/palavras
         [HttpPost]
+
+        
         public ActionResult Cadastrar([FromBody]Palavra palavra)
         {
 
@@ -262,6 +282,13 @@ namespace Mimic_Api.V1.Controllers
             //pela url /api/palavras/id da palavra cadastra, e no corpo retorna a palavra.
 
         }
+
+        /// <summary>
+        /// Operacao que realiza a substituição de dados de uma palavra especifica
+        /// </summary>
+        /// <param name="id">codigo Idenditifcaor</param>
+        /// <param name="palavra">Objeto Palavra com dados para alteração.</param>
+        /// <returns></returns>
 
         // -- /api/palavras/1 (put:id,nome,ativo,pontução,criacao).
 
@@ -316,12 +343,23 @@ namespace Mimic_Api.V1.Controllers
             return Ok();
         }
 
+
+        /// <summary>
+        /// operacao que desativa uma palavra dos sistema.
+        /// </summary>
+        /// <param name="id">codigo indentificar da palavra</param>
+        /// <returns></returns>
+
+
+
         // -- /api/palavras/1 (delete)
 
 
         //indica que esse metodo vai funcionar apenas na versão da APi 1.1
         
         [MapToApiVersion("1.1")]
+
+       
 
 
         [HttpDelete("{id}",Name = "ExcluirPalavra")]

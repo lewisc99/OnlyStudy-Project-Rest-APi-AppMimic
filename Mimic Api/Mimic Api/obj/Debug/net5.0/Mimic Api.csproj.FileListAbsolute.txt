@@ -62,3 +62,5 @@ C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\Microsoft.Ope
 C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\Microsoft.Extensions.PlatformAbstractions.dll
+C:\Users\Pichau\Desktop\Mimic\Mimic Api\Mimic Api\bin\Debug\net5.0\Mimic Api.xml

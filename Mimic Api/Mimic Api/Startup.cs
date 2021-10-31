@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.OpenApi.Models;
 using Mimic_Api.Helpers;
 using Mimic_Api.Helpers.Swagger;
@@ -15,6 +16,7 @@ using Mimic_Api.V1.Repositories.Contracts;
 using MimicApi.Database;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -92,7 +94,18 @@ namespace Mimic_Api
                 c.SwaggerDoc("v1.1", new OpenApiInfo { Title = "MimicAPi  v1.1", Version = "v1.1" });
                 c.SwaggerDoc("v1.0", new OpenApiInfo { Title = "MimicAPi v1.0", Version = "v1.0" });
 
+                //para adicionar a documentaçaõ no swagger, primeiro precisa ir em propriefdades do projeto
+                //depois ir em build depois em xml documentationfile e por fim deixar apenas Mimic Api.xml
+                //e para ativar no swagger com o commando abaixo.
 
+                var caminhoDoProjeto = PlatformServices.Default.Application.ApplicationBasePath; //para usar o PlatFormServices precisa baixar o nuget packager Microsoft.Extensions.PlatformAbstractions
+                //acima e o caminho da onde está o arquivo que desejamos obter, e abaixo e o nome padrão do arquivo que desejasmos acima.
+                var nomeProjeto = PlatformServices.Default.Application.ApplicationName +".xml";
+
+                var caminhoArquivoXMLComentario = Path.Combine(caminhoDoProjeto, nomeProjeto); //aqui junta o endereço do arquivo em nome computador + o nome do projeto.
+                c.IncludeXmlComments(caminhoArquivoXMLComentario); //e aqui adicionar no Swagger a documentação.
+
+         
 
                 // para fazer esse versionamento de codigo, ou versão, funcionar usando o Swagger.
 
